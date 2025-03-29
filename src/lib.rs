@@ -1,4 +1,5 @@
 #![feature(cell_update)]
+#![feature(str_from_utf16_endian)]
 
 mod arc_cow;
 pub use arc_cow::ArcCow;
@@ -12,6 +13,9 @@ pub use log::*;
 
 mod option;
 pub use option::*;
+
+mod io;
+pub use io::*;
 
 // -----------------------------------------------------------------------------
 

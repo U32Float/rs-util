@@ -55,6 +55,23 @@ pub trait RangeInclusiveExt<T>: Sized {
         (Pct::from(1u8) - pct) * *self.start() + pct * *self.end()
     }
 
+    #[inline(always)]
+    fn fraction(self, x: T) -> f32
+    where
+        T: Sub<Output = T> + Div<Output = f32> + Copy,
+    {
+        (x - *self.start()) / (*self.end() - *self.start())
+    }
+
+    #[inline(always)]
+    fn fraction_clamped(self, x: T) -> f32
+    where
+        T: Sub<Output = T> + Div<Output = f32> + Copy,
+    {
+        self.fraction(x).clamp(0f32, 1f32)
+    }
+
+    #[inline(always)]
     /// Linearly remap a value from one range to another,
     /// so that when `x == self.start()` returns `to.start()`
     /// and when `x == self.end()` returns `to.end()`.
@@ -75,6 +92,7 @@ pub trait RangeInclusiveExt<T>: Sized {
         to.lerp(t)
     }
 
+    #[inline(always)]
     /// Like [`remap`], but also clamps the value so that the returned value is always in the `to` range.
     fn remap_clamp(self, x: T, to: impl Into<RangeInclusive<T>>) -> T
     where

@@ -17,6 +17,9 @@ pub use option::*;
 mod io;
 pub use io::*;
 
+mod range;
+pub use range::*;
+
 // -----------------------------------------------------------------------------
 
 #[derive(Debug, Default)]
@@ -132,35 +135,6 @@ pub fn post_inc<T: From<u8> + std::ops::AddAssign<T> + Copy>(value: &mut T) -> T
     let prev = *value;
     *value += T::from(1);
     prev
-}
-
-// -----------------------------------------------------------------------------
-
-pub trait RangeExt<T: Ord + Clone>: Sized {
-    fn from_exclusive(start: T, end: T) -> Self;
-    fn start(&self) -> &T;
-    fn end(&self) -> &T;
-
-    fn intersect(&self, other: &Self) -> Self {
-        Self::from_exclusive(
-            std::cmp::max(self.start().clone(), other.start().clone()),
-            std::cmp::min(self.end().clone(), other.end().clone()),
-        )
-    }
-}
-
-impl<T: Ord + Clone> RangeExt<T> for std::ops::Range<T> {
-    fn from_exclusive(start: T, end: T) -> Self {
-        start..end
-    }
-
-    fn start(&self) -> &T {
-        &self.start
-    }
-
-    fn end(&self) -> &T {
-        &self.end
-    }
 }
 
 // -----------------------------------------------------------------------------

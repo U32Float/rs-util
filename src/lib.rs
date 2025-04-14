@@ -20,6 +20,9 @@ pub use io::*;
 mod range;
 pub use range::*;
 
+mod toggle;
+pub use toggle::*;
+
 // -----------------------------------------------------------------------------
 
 #[derive(Debug, Default)]
@@ -99,7 +102,7 @@ impl<T: Copy> RcCell<T> {
     }
 
     #[inline(always)]
-    pub fn update(&self, f: impl FnOnce(T) -> T) -> T {
+    pub fn update(&self, f: impl FnOnce(T) -> T) {
         self.0.update(f)
     }
 

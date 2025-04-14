@@ -36,6 +36,7 @@ pub trait RangeInclusiveExt<T>: Sized {
     fn start(&self) -> &T;
     fn end(&self) -> &T;
 
+    #[inline(always)]
     fn intersect(&self, other: &Self) -> Self
     where
         T: Clone + Ord,
@@ -47,35 +48,35 @@ pub trait RangeInclusiveExt<T>: Sized {
     }
 
     #[inline(always)]
-    fn lerp<Pct>(self, pct: Pct) -> T
+    fn lerp<F>(self, fraction: F) -> T
     where
         T: Add<Output = T> + Copy,
-        Pct: From<u8> + Sub<Output = Pct> + Mul<T, Output = T> + Copy,
+        F: From<u8> + Sub<Output = F> + Mul<T, Output = T> + Copy,
     {
-        (Pct::from(1u8) - pct) * *self.start() + pct * *self.end()
+        (F::from(1u8) - fraction) * *self.start() + fraction * *self.end()
     }
 
     #[inline(always)]
-    fn fraction(self, x: T) -> f32
+    fn fraction(self, value: T) -> f32
     where
         T: Sub<Output = T> + Div<Output = f32> + Copy,
     {
-        (x - *self.start()) / (*self.end() - *self.start())
+        (value - *self.start()) / (*self.end() - *self.start())
     }
 
     #[inline(always)]
-    fn fraction_clamped(self, x: T) -> f32
+    fn fraction_clamp(self, value: T) -> f32
     where
         T: Sub<Output = T> + Div<Output = f32> + Copy,
     {
-        self.fraction(x).clamp(0f32, 1f32)
+        self.fraction(value).clamp(0f32, 1f32)
     }
 
     #[inline(always)]
     /// Linearly remap a value from one range to another,
     /// so that when `x == self.start()` returns `to.start()`
     /// and when `x == self.end()` returns `to.end()`.
-    fn remap(self, x: T, to: impl Into<RangeInclusive<T>>) -> T
+    fn remap(self, value: T, to: impl Into<RangeInclusive<T>>) -> T
     where
         T: Copy
             + PartialEq
@@ -88,13 +89,13 @@ pub trait RangeInclusiveExt<T>: Sized {
         let from = self;
         let to = to.into();
         debug_assert!(from.start() != from.end());
-        let t = (x - *from.start()) / (*from.end() - *from.start());
+        let t = (value - *from.start()) / (*from.end() - *from.start());
         to.lerp(t)
     }
 
     #[inline(always)]
     /// Like [`remap`], but also clamps the value so that the returned value is always in the `to` range.
-    fn remap_clamp(self, x: T, to: impl Into<RangeInclusive<T>>) -> T
+    fn remap_clamp(self, value: T, to: impl Into<RangeInclusive<T>>) -> T
     where
         T: Copy
             + PartialEq
@@ -109,15 +110,15 @@ pub trait RangeInclusiveExt<T>: Sized {
         let to = to.into();
         if from.end() < from.start() {
             return Self::from_inclusive(*from.end(), *from.start())
-                .remap_clamp(x, *to.end()..=*to.start());
+                .remap_clamp(value, *to.end()..=*to.start());
         }
-        if x <= *from.start() {
+        if value <= *from.start() {
             *to.start()
-        } else if *from.end() <= x {
+        } else if *from.end() <= value {
             *to.end()
         } else {
             debug_assert!(from.start() != from.end());
-            let t = (x - *from.start()) / (*from.end() - *from.start());
+            let t = (value - *from.start()) / (*from.end() - *from.start());
             // Ensure no numerical inaccuracies sneak in:
             if T::from(1u8) <= t {
                 *to.end()

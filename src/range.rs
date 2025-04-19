@@ -1,17 +1,27 @@
-use std::ops::{Add, Div, Mul, RangeInclusive, Sub};
+use std::ops::{Add, Div, Mul, Range, RangeInclusive, Sub};
 
 // -----------------------------------------------------------------------------
 
-pub trait RangeExt<T: Ord + Clone>: Sized {
+pub trait RangeExt<T>: Sized {
     fn from_exclusive(start: T, end: T) -> Self;
     fn start(&self) -> &T;
     fn end(&self) -> &T;
 
-    fn intersect(&self, other: &Self) -> Self {
+    fn intersect(&self, other: &Self) -> Self
+    where
+        T: Clone + Ord,
+    {
         Self::from_exclusive(
             std::cmp::max(self.start().clone(), other.start().clone()),
             std::cmp::min(self.end().clone(), other.end().clone()),
         )
+    }
+
+    fn map<U>(self, f: impl Fn(T) -> U) -> Range<U>
+    where
+        T: Clone,
+    {
+        f(self.start().clone())..f(self.end().clone())
     }
 }
 
@@ -35,6 +45,13 @@ pub trait RangeInclusiveExt<T>: Sized {
     fn from_inclusive(start: T, end: T) -> Self;
     fn start(&self) -> &T;
     fn end(&self) -> &T;
+
+    fn map<U>(self, f: impl Fn(T) -> U) -> RangeInclusive<U>
+    where
+        T: Clone,
+    {
+        f(self.start().clone())..=f(self.end().clone())
+    }
 
     #[inline(always)]
     fn intersect(&self, other: &Self) -> Self

@@ -149,6 +149,14 @@ macro_rules! implies {
     };
 }
 
+#[macro_export]
+macro_rules! pub_use {
+    (mod $name:ident) => {
+        mod $name;
+        pub use $name::*;
+    };
+}
+
 // -----------------------------------------------------------------------------
 
 #[macro_export]

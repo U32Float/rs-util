@@ -54,6 +54,14 @@ impl<T> RcRefCell<T> {
     pub fn borrow_mut(&self) -> std::cell::RefMut<T> {
         self.0.borrow_mut()
     }
+
+    #[inline(always)]
+    pub fn take(&self) -> T
+    where
+        T: Default,
+    {
+        (&self.0).take()
+    }
 }
 
 pub struct WeakRefCell<T>(std::rc::Weak<std::cell::RefCell<T>>);

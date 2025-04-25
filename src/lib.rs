@@ -14,6 +14,7 @@ pub_use!(mod io);
 pub_use!(mod range);
 pub_use!(mod toggle);
 pub_use!(mod cell);
+pub_use!(mod task);
 
 // -----------------------------------------------------------------------------
 

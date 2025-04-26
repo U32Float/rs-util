@@ -2,7 +2,7 @@ use std::sync::{Arc, Condvar, Mutex};
 
 /// A task that can be awaited in an async context or waited for in a sync context without `block_on`.
 pub struct Task<T> {
-    awaitable: std::pin::Pin<Box<dyn Future<Output = T> + Send>>,
+    future: std::pin::Pin<Box<dyn Future<Output = T> + Send>>,
     pair: Option<Arc<(Mutex<Option<T>>, Condvar)>>,
 }
 
@@ -14,15 +14,15 @@ impl<T> Future for Task<T> {
         cx: &mut std::task::Context<'_>,
     ) -> std::task::Poll<Self::Output> {
         self.pair.take(); // Decrease reference count to prevent panic.
-        self.awaitable.as_mut().poll(cx)
+        self.future.as_mut().poll(cx)
     }
 }
 
 impl<T> Task<T> {
     /// Wait for the task to complete and return the result in a sync context.
     pub fn wait_sync(self) -> T {
-        let (lock, cvar) = &*self.pair.unwrap();
-        let mut guard = lock.lock().unwrap();
+        let (slot, cvar) = &*self.pair.unwrap();
+        let mut guard = slot.lock().unwrap();
         while guard.is_none() {
             guard = cvar.wait(guard).unwrap(); // blocks until notified
         }
@@ -43,25 +43,25 @@ where
     let (runnable, task) = async_task::spawn(
         async move {
             let val = future.await;
-            let (lock, cvar) = &*pair_task;
-            *lock.lock().unwrap() = Some(val);
+            let (slot, cvar) = &*pair_task;
+            *slot.lock().unwrap() = Some(val);
             cvar.notify_all(); // Wake up any waiting sync threads
         },
         schedule,
     );
 
-    let awaitable = async move {
+    let future = async move {
         task.await;
-        let (lock, _) = Arc::try_unwrap(pair)
+        let (slot, _) = Arc::try_unwrap(pair)
             .ok()
             .expect("Multiple references remain");
-        lock.into_inner().unwrap().expect("Result not set")
+        slot.into_inner().unwrap().expect("Result not set")
     };
 
     (
         runnable,
         Task {
-            awaitable: Box::pin(awaitable),
+            future: Box::pin(future),
             pair: Some(pair_sync),
         },
     )

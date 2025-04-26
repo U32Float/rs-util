@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! id_type {
-    ($name: ident) => {
+    (struct $name: ident) => {
         #[derive(
             Debug, Default, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize,
         )]
@@ -32,7 +32,7 @@ macro_rules! id_type {
 
 #[macro_export]
 macro_rules! atomic_id_type {
-    ($name: ident) => {
+    (struct $name: ident) => {
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
         pub struct $name(u64);
 

@@ -26,6 +26,8 @@ pub_use!(mod toggle);
 pub_use!(mod cell);
 #[cfg(feature = "async")]
 pub_use!(mod task);
+#[cfg(feature = "builder")]
+pub_use!(mod builder);
 
 // -----------------------------------------------------------------------------
 

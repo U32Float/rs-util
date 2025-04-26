@@ -15,6 +15,7 @@ option = []
 shared_string = []
 toggle = []
 range = []
+builder = []
 
 all = [
     "io",
@@ -28,6 +29,7 @@ all = [
     "shared_string",
     "toggle",
     "range",
+    "builder",
 ]
 
 

@@ -5,6 +5,41 @@ use tracing::{Level, event};
 // -----------------------------------------------------------------------------
 
 #[macro_export]
+macro_rules! const_assert {
+    ($cond:expr, $($arg:tt)*) => {
+        const {
+            if !$cond {
+                panic!($($arg)*);
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! const_assert_eq {
+    ($left:expr, $right: expr, $($arg:tt)*) => {
+        const {
+            if $left != $right {
+                panic!($($arg)*);
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! const_assert_ne {
+    ($left:expr, $right: expr, $($arg:tt)*) => {
+        const {
+            if $left == $right {
+                panic!($($arg)*);
+            }
+        }
+    };
+}
+
+// -----------------------------------------------------------------------------
+
+#[macro_export]
 macro_rules! debug_panic {
     ( $($fmt_arg:tt)* ) => {
         if cfg!(debug_assertions) {

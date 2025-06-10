@@ -46,6 +46,7 @@ where
             let (slot, cvar) = &*pair_task;
             *slot.lock().unwrap() = Some(val);
             cvar.notify_all(); // Wake up any waiting sync threads
+            drop(pair_task);
         },
         schedule,
     );

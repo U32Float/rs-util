@@ -16,6 +16,8 @@ shared_string = []
 toggle = []
 range = []
 builder = []
+retainable = []
+copy_on_write = []
 
 all = [
     "io",
@@ -30,6 +32,8 @@ all = [
     "toggle",
     "range",
     "builder",
+    "retainable",
+    "copy_on_write",
 ]
 
 

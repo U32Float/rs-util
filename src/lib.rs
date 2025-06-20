@@ -28,6 +28,10 @@ pub_use!(mod cell);
 pub_use!(mod task);
 #[cfg(feature = "builder")]
 pub_use!(mod builder);
+#[cfg(feature = "retainable")]
+pub_use!(mod retainable);
+#[cfg(feature = "copy_on_write")]
+pub_use!(mod copy_on_write);
 
 // -----------------------------------------------------------------------------
 
@@ -59,7 +63,6 @@ impl<T> LockExt<T> for Mutex<T> {
 }
 
 // -----------------------------------------------------------------------------
-
 #[inline(always)]
 pub fn post_inc<T: From<u8> + std::ops::AddAssign<T> + Copy>(value: &mut T) -> T {
     let prev = *value;

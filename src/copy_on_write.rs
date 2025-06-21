@@ -23,16 +23,31 @@ impl<T: Clone> CopyOnWrite<T> {
 
     #[inline(always)]
     pub fn write<R>(&mut self, f: impl FnOnce(&mut T) -> R) -> R {
-        let mut value = (*self.0).clone();
-        let ret = f(&mut value);
-        self.0 = std::sync::Arc::new(value);
-        ret
+        if std::sync::Arc::strong_count(&self.0) > 1 {
+            // More than one owner, need to clone first
+            let mut value = (*self.0).clone();
+            let ret = f(&mut value);
+            self.0 = std::sync::Arc::new(value);
+            ret
+        } else {
+            // Has unique ownership, can mutate directly
+            return f(unsafe { &mut *(std::sync::Arc::as_ptr(&self.0) as *mut T) });
+        }
     }
 }
 
 impl<T> AsRef<T> for CopyOnWrite<T> {
     #[inline(always)]
     fn as_ref(&self) -> &T {
+        &self.0
+    }
+}
+
+impl<T> std::ops::Deref for CopyOnWrite<T> {
+    type Target = T;
+
+    #[inline(always)]
+    fn deref(&self) -> &T {
         &self.0
     }
 }

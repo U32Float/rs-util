@@ -42,6 +42,14 @@ impl<T> AsMut<T> for Retainable<T> {
     }
 }
 
+impl<T> std::ops::Deref for Retainable<T> {
+    type Target = T;
+
+    fn deref(&self) -> &T {
+        &self.value
+    }
+}
+
 #[derive(Clone)]
 pub struct Subscription(std::sync::Arc<()>);
 

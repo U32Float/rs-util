@@ -1,4 +1,3 @@
-#![feature(cell_update)]
 #![feature(str_from_utf16_endian)]
 
 use parking_lot::Mutex;

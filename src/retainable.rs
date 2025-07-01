@@ -1,5 +1,3 @@
-use std::ops::Sub;
-
 /// A value that is retained until the last [`Subscription`] is dropped.
 /// Dropping must be done manually after checking `self.retain()`.
 pub struct Retainable<T> {
@@ -51,6 +49,7 @@ impl<T> std::ops::Deref for Retainable<T> {
 }
 
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct Subscription(std::sync::Arc<()>);
 
 impl Subscription {

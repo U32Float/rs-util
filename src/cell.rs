@@ -19,12 +19,12 @@ impl<T> RcRefCell<T> {
     }
 
     #[inline(always)]
-    pub fn borrow(&self) -> std::cell::Ref<T> {
+    pub fn borrow(&self) -> std::cell::Ref<'_, T> {
         self.0.borrow()
     }
 
     #[inline(always)]
-    pub fn borrow_mut(&self) -> std::cell::RefMut<T> {
+    pub fn borrow_mut(&self) -> std::cell::RefMut<'_, T> {
         self.0.borrow_mut()
     }
 

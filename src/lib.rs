@@ -3,7 +3,7 @@
 use parking_lot::Mutex;
 
 #[cfg(feature = "id")]
-pub mod id;
+pub_use!(mod id);
 #[cfg(feature = "macros")]
 pub mod macros;
 

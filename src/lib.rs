@@ -31,6 +31,8 @@ pub_use!(mod builder);
 pub_use!(mod retainable);
 #[cfg(feature = "copy_on_write")]
 pub_use!(mod copy_on_write);
+#[cfg(feature = "deferred")]
+pub_use!(mod deferred);
 
 // -----------------------------------------------------------------------------
 

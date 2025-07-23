@@ -2,44 +2,50 @@
 
 use parking_lot::Mutex;
 
-#[cfg(feature = "id")]
-pub_use!(mod id);
 #[cfg(feature = "macros")]
 pub mod macros;
 
-#[cfg(feature = "arc_cow")]
-pub_use!(mod arc_cow);
-#[cfg(feature = "shared_string")]
-pub_use!(mod shared_string);
-#[cfg(feature = "log")]
-pub_use!(mod log);
-#[cfg(feature = "option")]
-pub_use!(mod option);
-#[cfg(feature = "io")]
-pub_use!(mod io);
-#[cfg(feature = "range")]
-pub_use!(mod range);
-#[cfg(feature = "toggle")]
-pub_use!(mod toggle);
-#[cfg(feature = "cell")]
-pub_use!(mod cell);
-#[cfg(feature = "async")]
-pub_use!(mod task);
-#[cfg(feature = "builder")]
-pub_use!(mod builder);
-#[cfg(feature = "retainable")]
-pub_use!(mod retainable);
-#[cfg(feature = "copy_on_write")]
-pub_use!(mod copy_on_write);
-#[cfg(feature = "deferred")]
-pub_use!(mod deferred);
+pub_use! {
+    #[cfg(feature = "id")]
+    mod id;
+    #[cfg(feature = "arc_cow")]
+    mod arc_cow;
+    #[cfg(feature = "shared_string")]
+    mod shared_string;
+    #[cfg(feature = "log")]
+    mod log;
+    #[cfg(feature = "option")]
+    mod option;
+    #[cfg(feature = "io")]
+    mod io;
+    #[cfg(feature = "range")]
+    mod range;
+    #[cfg(feature = "toggle")]
+    mod toggle;
+    #[cfg(feature = "cell")]
+    mod cell;
+    #[cfg(feature = "async")]
+    mod task;
+    #[cfg(feature = "builder")]
+    mod builder;
+    #[cfg(feature = "retainable")]
+    mod retainable;
+    #[cfg(feature = "copy_on_write")]
+    mod copy_on_write;
+    #[cfg(feature = "deferred")]
+    mod deferred;
+}
 
 // -----------------------------------------------------------------------------
 
 #[macro_export]
 macro_rules! pub_use {
-    ($(mod $name:ident $(;)?)*) => {
+    ($(
+        $(#[$attr:meta])?
+        mod $name:ident $(;)?
+    )*) => {
         $(
+            $(#[$attr])?
             mod $name;
             pub use $name::*;
         )*

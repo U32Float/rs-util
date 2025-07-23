@@ -38,9 +38,11 @@ pub_use!(mod deferred);
 
 #[macro_export]
 macro_rules! pub_use {
-    (mod $name:ident) => {
-        mod $name;
-        pub use $name::*;
+    ($(mod $name:ident $(;)?)*) => {
+        $(
+            mod $name;
+            pub use $name::*;
+        )*
     };
 }
 

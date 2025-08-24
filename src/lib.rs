@@ -1,6 +1,10 @@
 #![feature(str_from_utf16_endian)]
+#![feature(hash_set_entry)]
+
+use std::{collections::hash_set::Entry, hash::Hash, sync::OnceLock};
 
 use parking_lot::Mutex;
+use rustc_hash::FxHashSet;
 
 #[cfg(feature = "macros")]
 pub mod macros;
@@ -72,9 +76,42 @@ impl<T> LockExt<T> for Mutex<T> {
 }
 
 // -----------------------------------------------------------------------------
+
 #[inline(always)]
 pub fn post_inc<T: From<u8> + std::ops::AddAssign<T> + Copy>(value: &mut T) -> T {
     let prev = *value;
     *value += T::from(1);
     prev
+}
+
+#[inline]
+/// Hash the given value with a predictable hasher.
+pub fn hash(value: impl std::hash::Hash) -> u64 {
+    ahash::RandomState::with_seeds(1, 2, 3, 4).hash_one(value)
+}
+
+#[inline(always)]
+/// Executes the given function only once for each unique `id`.
+/// Subsequent calls with the same `id` will be ignored.
+pub fn once<T>(id: impl Hash, f: impl FnOnce() -> T) -> Option<T> {
+    static COMPLETION_SET: OnceLock<Mutex<FxHashSet<u64>>> = OnceLock::new();
+    let mut lock = COMPLETION_SET
+        .get_or_init(|| Mutex::new(FxHashSet::default()))
+        .lock();
+    match lock.entry(hash(id)) {
+        Entry::Occupied(_) => None,
+        Entry::Vacant(entry) => {
+            entry.insert();
+            Some(f())
+        }
+    }
+}
+
+#[inline(always)]
+#[track_caller]
+/// Executes the function only the first time it is invoked from a given source location.  
+/// Similar to `once`, but uses the caller’s source location as the unique identifier.
+pub fn once_at_source<T>(f: impl FnOnce() -> T) -> Option<T> {
+    let location = std::panic::Location::caller();
+    once(location, f)
 }

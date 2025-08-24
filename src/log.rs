@@ -1,6 +1,7 @@
 use std::panic::Location;
-
 use tracing::{Level, event};
+
+mod tracing_macros;
 
 // -----------------------------------------------------------------------------
 

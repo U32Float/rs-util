@@ -89,7 +89,7 @@ macro_rules! global_id_type {
         $(global_id_type!(@internal $vis struct $name);)*
     };
     (@internal $vis:vis struct $name: ident) => {
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
         $vis struct $name(u64);
 
         impl $name {

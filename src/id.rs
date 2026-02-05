@@ -48,20 +48,14 @@ impl From<&str> for Id {
 
 #[macro_export]
 macro_rules! id_type {
-    (struct $name: ident) => {
-        id_type!(@internal $name,);
+    ($($vis:vis struct $name:ident);* $(;)?)=> {
+        $(id_type!(@internal $vis struct $name);)*
     };
-    (pub struct $name: ident) => {
-        id_type!(@internal $name, pub);
-    };
-    (pub ( $($vis:tt)+ ) struct $name: ident) => {
-        id_type!(@internal $name, pub ($($vis)*));
-    };
-    (@internal $name: ident, $($vis:tt)*) => {
+    (@internal $vis:vis struct $name:ident) => {
         #[derive(
             Debug, Default, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize,
         )]
-        $($vis)* struct $name(u64);
+        $vis struct $name(u64);
 
         impl $name {
             #[inline(always)]
@@ -91,18 +85,12 @@ macro_rules! id_type {
 
 #[macro_export]
 macro_rules! global_id_type {
-    (struct $name: ident) => {
-        global_id_type!(@internal $name,);
+    ($($vis:vis struct $name:ident);* $(;)?)=> {
+        $(global_id_type!(@internal $vis struct $name);)*
     };
-    (pub struct $name: ident) => {
-        global_id_type!(@internal $name, pub);
-    };
-    (pub ( $($vis:tt)+ ) struct $name: ident) => {
-        global_id_type!(@internal $name, pub ($($vis)*));
-    };
-    (@internal $name: ident, $($vis:tt)*) => {
+    (@internal $vis:vis struct $name: ident) => {
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-        $($vis)* struct $name(u64);
+        $vis struct $name(u64);
 
         impl $name {
             #[inline(always)]

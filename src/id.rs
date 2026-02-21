@@ -53,7 +53,7 @@ macro_rules! id_type {
     };
     (@internal $vis:vis struct $name:ident) => {
         #[derive(
-            Debug, Default, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize,
+            Debug, Default, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, serde::Serialize, serde::Deserialize,
         )]
         $vis struct $name(u64);
 
@@ -66,6 +66,13 @@ macro_rules! id_type {
             #[inline(always)]
             pub fn next(self) -> Self {
                 Self(self.0 + 1)
+            }
+
+            #[inline(always)]
+            pub fn post_inc(&mut self) -> Self {
+                let current = *self;
+                *self = self.next();
+                current
             }
         }
 

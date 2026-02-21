@@ -13,7 +13,7 @@ macro_rules! collection {
 #[macro_export]
 macro_rules! implies {
     ($p:expr => $q:expr) => {
-        ($p && $q) || !$p
+        (!$p || $q)
     };
 }
 

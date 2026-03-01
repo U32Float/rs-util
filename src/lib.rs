@@ -43,6 +43,20 @@ pub_use! {
 // -----------------------------------------------------------------------------
 
 #[macro_export]
+macro_rules! local_use {
+    ($(
+        $(#[$attr:meta])?
+        mod $name:ident $(;)?
+    )*) => {
+        $(
+            $(#[$attr])?
+            mod $name;
+            use $name::*;
+        )*
+    };
+}
+
+#[macro_export]
 macro_rules! pub_use {
     ($(
         $(#[$attr:meta])?
@@ -109,7 +123,7 @@ pub fn once<T>(id: impl Hash, f: impl FnOnce() -> T) -> Option<T> {
 
 #[inline(always)]
 #[track_caller]
-/// Executes the function only the first time it is invoked from a given source location.  
+/// Executes the function only the first time it is invoked from a given source location.
 /// Similar to `once`, but uses the caller’s source location as the unique identifier.
 pub fn once_at_source<T>(f: impl FnOnce() -> T) -> Option<T> {
     let location = std::panic::Location::caller();

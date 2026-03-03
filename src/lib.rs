@@ -38,6 +38,8 @@ pub_use! {
     mod copy_on_write;
     #[cfg(feature = "deferred")]
     mod deferred;
+    #[cfg(feature = "puffin")]
+    mod profile;
 }
 
 // -----------------------------------------------------------------------------

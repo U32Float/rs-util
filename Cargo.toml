@@ -4,39 +4,42 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-io = []
 arc_cow = []
 async = ["dep:async-task"]
+builder = []
 cell = []
+copy_on_write = []
+deferred = []
 id = ["dep:nohash-hasher", "dep:ahash"]
+io = []
 log = []
 macros = []
 option = []
+puffin = ["dep:puffin"]
+range = []
+retainable = []
 shared_string = []
 toggle = []
-range = []
-builder = []
-retainable = []
-copy_on_write = []
-deferred = []
 
 all = [
-    "io",
     "arc_cow",
     "async",
+    "builder",
     "cell",
+    "copy_on_write",
+    "deferred",
     "id",
+    "io",
     "log",
     "macros",
     "option",
+    "puffin",
+    "range",
+    "retainable",
     "shared_string",
     "toggle",
-    "range",
-    "builder",
-    "retainable",
-    "copy_on_write",
-    "deferred",
 ]
+default = ["all"]
 
 
 [dependencies]
@@ -49,6 +52,7 @@ async-task = { version = "4.7.1", optional = true }
 nohash-hasher = { version = "0.2.0", optional = true }
 ahash = { version = "0.8.12", optional = true }
 rustc-hash = "2.1.1"
+puffin = { version = "0.19.1", optional = true }
 
 
 anyhow = "1.0.86"

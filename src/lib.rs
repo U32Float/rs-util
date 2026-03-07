@@ -48,11 +48,11 @@ pub_use! {
 macro_rules! local_use {
     ($(
         $(#[$attr:meta])?
-        mod $name:ident $(;)?
+        $vis:vis mod $name:ident $(;)?
     )*) => {
         $(
             $(#[$attr])?
-            mod $name;
+            $vis mod $name;
             use $name::*;
         )*
     };
@@ -62,11 +62,11 @@ macro_rules! local_use {
 macro_rules! pub_use {
     ($(
         $(#[$attr:meta])?
-        mod $name:ident $(;)?
+        $vis:vis mod $name:ident $(;)?
     )*) => {
         $(
             $(#[$attr])?
-            mod $name;
+            $vis mod $name;
             pub use $name::*;
         )*
     };

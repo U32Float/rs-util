@@ -106,11 +106,12 @@ pub fn hash(value: impl std::hash::Hash) -> u64 {
     ahash::RandomState::with_seeds(1, 2, 3, 4).hash_one(value)
 }
 
+static COMPLETION_SET: OnceLock<Mutex<FxHashSet<u64>>> = OnceLock::new();
+
 #[inline(always)]
 /// Executes the given function only once for each unique `id`.
 /// Subsequent calls with the same `id` will be ignored.
 pub fn once<T>(id: impl Hash, f: impl FnOnce() -> T) -> Option<T> {
-    static COMPLETION_SET: OnceLock<Mutex<FxHashSet<u64>>> = OnceLock::new();
     let mut lock = COMPLETION_SET
         .get_or_init(|| Mutex::new(FxHashSet::default()))
         .lock();
@@ -124,10 +125,28 @@ pub fn once<T>(id: impl Hash, f: impl FnOnce() -> T) -> Option<T> {
 }
 
 #[inline(always)]
+pub fn clear_once_cache() {
+    COMPLETION_SET.get().inspect(|s| s.lock().clear());
+}
+
+#[inline(always)]
 #[track_caller]
 /// Executes the function only the first time it is invoked from a given source location.
 /// Similar to `once`, but uses the caller’s source location as the unique identifier.
 pub fn once_at_source<T>(f: impl FnOnce() -> T) -> Option<T> {
     let location = std::panic::Location::caller();
     once(location, f)
+}
+
+#[macro_export]
+macro_rules! assert_once {
+    () => {
+        $crate::assert_once!("Repeated call to assert_once")
+    };
+    ($($arg:tt)+) => {
+        assert!(
+            $crate::once_at_source(|| ()).is_some(),
+            $($arg)*
+        );
+    }
 }

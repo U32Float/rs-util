@@ -59,6 +59,20 @@ macro_rules! local_use {
 }
 
 #[macro_export]
+macro_rules! crate_use {
+    ($(
+        $(#[$attr:meta])?
+        $vis:vis mod $name:ident $(;)?
+    )*) => {
+        $(
+            $(#[$attr])?
+            $vis mod $name;
+            pub(crate) use $name::*;
+        )*
+    };
+}
+
+#[macro_export]
 macro_rules! pub_use {
     ($(
         $(#[$attr:meta])?

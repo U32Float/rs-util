@@ -33,7 +33,7 @@ impl<T> RcRefCell<T> {
     where
         T: Default,
     {
-        (&self.0).take()
+        self.0.take()
     }
 }
 

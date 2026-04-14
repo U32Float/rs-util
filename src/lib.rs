@@ -1,14 +1,6 @@
 #![feature(str_from_utf16_endian)]
 #![feature(hash_set_entry)]
 
-use std::{collections::hash_set::Entry, hash::Hash, sync::OnceLock};
-
-use parking_lot::Mutex;
-use rustc_hash::FxHashSet;
-
-#[cfg(feature = "macros")]
-pub mod macros;
-
 pub_use! {
     #[cfg(feature = "id")]
     mod id;
@@ -41,6 +33,16 @@ pub_use! {
     #[cfg(feature = "puffin")]
     mod profile;
 }
+
+#[cfg(feature = "macros")]
+pub mod macros;
+
+// -----------------------------------------------------------------------------
+
+use std::{collections::hash_set::Entry, hash::Hash, sync::OnceLock};
+
+use parking_lot::Mutex;
+use rustc_hash::FxHashSet;
 
 // -----------------------------------------------------------------------------
 

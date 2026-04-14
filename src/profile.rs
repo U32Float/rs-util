@@ -14,7 +14,7 @@ impl DetachedProfilerScope {
     pub fn new(details: ScopeDetails, data: impl AsRef<str>) -> Self {
         let scope = GlobalProfiler::lock().register_user_scopes(&[details]);
         let mut stream = puffin::Stream::default();
-        let (offset, start) = stream.begin_scope(|| now_ns(), scope[0], data.as_ref());
+        let (offset, start) = stream.begin_scope(now_ns, scope[0], data.as_ref());
 
         Self {
             stream: Some(stream),

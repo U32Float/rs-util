@@ -31,7 +31,7 @@ impl<T: Clone> CopyOnWrite<T> {
             ret
         } else {
             // Has unique ownership, can mutate directly
-            return f(unsafe { &mut *(std::sync::Arc::as_ptr(&self.0) as *mut T) });
+            f(unsafe { &mut *(std::sync::Arc::as_ptr(&self.0) as *mut T) })
         }
     }
 }

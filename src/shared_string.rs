@@ -1,26 +1,37 @@
-use derive_more::{Deref, DerefMut};
+use smol_str::SmolStr;
 
-use crate::arc_cow::ArcCow;
 use serde::{Deserialize, Serialize};
-use std::{borrow::Borrow, sync::Arc};
+use std::{
+    borrow::{Borrow, Cow},
+    ops::Deref,
+    sync::Arc,
+};
 
 // -----------------------------------------------------------------------------
 
-/// A shared string is an immutable string that can be cheaply cloned.
-/// Essentially an abstraction over an `Arc<str>` and `&'static str`,
-#[derive(Deref, DerefMut, Eq, PartialEq, PartialOrd, Ord, Hash, Clone)]
-pub struct SharedString(ArcCow<'static, str>);
+/// A shared string is an immutable string that can be cheaply cloned and can be stack allocated if it is smaller than 24 bytes.
+/// For now, it is just a wrapper around [`SmolStr`].
+#[derive(Eq, PartialEq, PartialOrd, Ord, Hash, Clone)]
+pub struct SharedString(SmolStr);
+
+impl Deref for SharedString {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        self.0.as_str()
+    }
+}
 
 impl SharedString {
     /// Creates a static [`SharedString`] from a `&'static str`.
     pub const fn new_static(str: &'static str) -> Self {
-        Self(ArcCow::Borrowed(str))
+        Self(SmolStr::new_static(str))
     }
 }
 
 impl Default for SharedString {
     fn default() -> Self {
-        Self(ArcCow::Owned(Arc::default()))
+        Self::new_static("")
     }
 }
 
@@ -44,7 +55,7 @@ impl std::fmt::Debug for SharedString {
 
 impl std::fmt::Display for SharedString {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0.as_ref())
+        write!(f, "{}", self.0.as_str())
     }
 }
 
@@ -72,22 +83,71 @@ impl<'a> PartialEq<&'a str> for SharedString {
     }
 }
 
-impl From<SharedString> for Arc<str> {
-    fn from(val: SharedString) -> Self {
-        match val.0 {
-            ArcCow::Borrowed(borrowed) => Arc::from(borrowed),
-            ArcCow::Owned(owned) => owned.clone(),
-        }
+impl From<&str> for SharedString {
+    #[inline]
+    fn from(value: &str) -> Self {
+        SharedString(SmolStr::from(value))
     }
 }
 
-impl<T: Into<ArcCow<'static, str>>> From<T> for SharedString {
-    fn from(value: T) -> Self {
-        Self(value.into())
+impl From<&mut str> for SharedString {
+    #[inline]
+    fn from(value: &mut str) -> Self {
+        SharedString(SmolStr::from(value))
+    }
+}
+
+impl From<String> for SharedString {
+    #[inline]
+    fn from(value: String) -> Self {
+        SharedString(SmolStr::from(value))
+    }
+}
+
+impl From<&String> for SharedString {
+    #[inline]
+    fn from(value: &String) -> Self {
+        SharedString(SmolStr::from(value))
+    }
+}
+
+impl From<Box<str>> for SharedString {
+    #[inline]
+    fn from(value: Box<str>) -> Self {
+        SharedString(SmolStr::from(value))
+    }
+}
+
+impl From<&Box<str>> for SharedString {
+    #[inline]
+    fn from(value: &Box<str>) -> Self {
+        SharedString(SmolStr::from(value.as_ref()))
+    }
+}
+
+impl From<Arc<str>> for SharedString {
+    #[inline]
+    fn from(value: Arc<str>) -> Self {
+        SharedString(SmolStr::from(value.as_ref()))
+    }
+}
+
+impl From<&Arc<str>> for SharedString {
+    #[inline]
+    fn from(value: &Arc<str>) -> Self {
+        SharedString(SmolStr::from(value.as_ref()))
+    }
+}
+
+impl<'a> From<Cow<'a, str>> for SharedString {
+    #[inline]
+    fn from(value: Cow<'a, str>) -> Self {
+        SharedString(SmolStr::from(value.as_ref()))
     }
 }
 
 impl From<SharedString> for String {
+    #[inline]
     fn from(val: SharedString) -> Self {
         val.0.to_string()
     }
